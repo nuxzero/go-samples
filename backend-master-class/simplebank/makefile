@@ -1,3 +1,5 @@
+DB_URL=postgresql://root:secret@localhost:5432/simple_bank?sslmode=disable
+
 # Create Postgres container
 postgres:
 	docker run --name postgres12 --network bank-network -p 5432:5432 -e POSTGRES_USER=root -e POSTGRES_PASSWORD=secret -d postgres:12-alpine
@@ -12,19 +14,19 @@ dropdb:
 
 # Migrate up all steps
 migrateup:
-	migrate -path db/migration -database "postgresql://root:secret@localhost:5432/simple_bank?sslmode=disable" -verbose up
+	migrate -path db/migration -database "$(DB_URL)" -verbose up
 
 # Migrate up 1 step
 migrateup1:
-	migrate -path db/migration -database "postgresql://root:secret@localhost:5432/simple_bank?sslmode=disable" -verbose up 1
+	migrate -path db/migration -database "$(DB_URL)" -verbose up 1
 
 # Migrate down all steps
 migratedown:
-	migrate -path db/migration -database "postgresql://root:secret@localhost:5432/simple_bank?sslmode=disable" -verbose down
+	migrate -path db/migration -database "$(DB_URL)" -verbose down
 
 # Migrate down 1 step
 migratedown1:
-	migrate -path db/migration -database "postgresql://root:secret@localhost:5432/simple_bank?sslmode=disable" -verbose down 1
+	migrate -path db/migration -database "$(DB_URL)" -verbose down 1
 
 # Run sqlc to generate code
 sqlc:
@@ -41,4 +43,11 @@ server:
 mock: 
 	mockgen -package mockdb -destination db/mock/store.go github.com/nuxzero/simplebank/db/sqlc Store
 
-.PHONY: postgres createdb dropdb sqlc test server mock
+# Generate proto https://protobuf.dev/reference/go/go-generated/
+proto:
+	rm -f pb/*.go
+	protoc --proto_path=proto --go_out=pb --go_opt=paths=source_relative \
+	--go-grpc_out=pb --go-grpc_opt=paths=source_relative \
+  proto/*.proto
+
+.PHONY: postgres createdb dropdb sqlc test server mock proto
