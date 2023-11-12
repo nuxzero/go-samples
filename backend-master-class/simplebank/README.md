@@ -47,3 +47,27 @@ You can force the version by running the command below. Then run migrate up agai
 ```sh
 migrate -path db/migration -database "postgresql://root:secret@localhost:5432/simple_bank?sslmode=disable" force 2 
 ```
+
+## gRPC Testing
+
+Use [evans](https://github.com/ktr0731/evans) to test gRPC from command line.
+
+### Usage
+
+Run evans
+
+```sh
+evans --host localhost --port 9090 -r repl
+```
+
+Show all services
+
+```sh
+show service
+```
+
+Call RPC method
+
+```sh
+call CreateUser
+```

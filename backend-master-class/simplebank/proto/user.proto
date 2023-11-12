@@ -10,6 +10,6 @@ message User {
   string username = 1; // this is field number normally use sequence number https://protobuf.dev/programming-guides/proto3/#assigning
   string full_name = 2;
   string email = 3;
-  google.protobuf.Timestamp password_created_at = 4; // Protobuf does not have build in date type so we use Timestamp from Google package
+  google.protobuf.Timestamp password_changed_at = 4; // Protobuf does not have build in date type so we use Timestamp from Google package
   google.protobuf.Timestamp created_at = 5; 
 }
