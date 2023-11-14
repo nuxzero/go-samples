@@ -71,3 +71,7 @@ Call RPC method
 ```sh
 call CreateUser
 ```
+
+## Documentation
+
+You can open http://localhost:8080/swagger/ to check out API documentation.

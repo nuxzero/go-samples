@@ -11,9 +11,11 @@ import (
 	_ "github.com/lib/pq"
 	"github.com/nuxzero/simplebank/api"
 	db "github.com/nuxzero/simplebank/db/sqlc"
+	_ "github.com/nuxzero/simplebank/doc/statik" // This required by Statik
 	"github.com/nuxzero/simplebank/gapi"
 	"github.com/nuxzero/simplebank/pb"
 	"github.com/nuxzero/simplebank/util"
+	"github.com/rakyll/statik/fs"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 	"google.golang.org/protobuf/encoding/protojson"
@@ -86,6 +88,18 @@ func runGatewayServer(config util.Config, store db.Store) {
 
 	mux := http.NewServeMux()
 	mux.Handle("/", grpcMux)
+
+	// Load files from embedded binary with Statik
+	statikFS, err := fs.New()
+	if err != nil {
+		log.Fatal("cannot create statik fs:", err)
+	}
+	swaggerHandler := http.StripPrefix("/swagger/", http.FileServer(statikFS))
+	mux.Handle("/swagger/", swaggerHandler)
+
+	// Serve Swagger UI from /doc/swagger directory through localhost:8080
+	// fs := http.FileServer(http.Dir("./doc/swagger"))
+	// mux.Handle("/swagger/", http.StripPrefix("/swagger/", fs))
 
 	listener, err := net.Listen("tcp", config.HTTPServerAddress)
 	if err != nil {
