@@ -4,20 +4,22 @@ FROM golang:1.19.12-alpine3.18 AS builder
 WORKDIR /app
 COPY . .
 RUN go build -o main main.go
+
+# No need to install migrate in the build stage because it runs migration in main.go file
 # Install curl to download migrate
-RUN apk add curl
-RUN curl -L https://github.com/golang-migrate/migrate/releases/download/v4.14.1/migrate.linux-amd64.tar.gz | tar xvz
+# RUN apk add curl
+# RUN curl -L https://github.com/golang-migrate/migrate/releases/download/v4.14.1/migrate.linux-amd64.tar.gz | tar xvz
 
 # Run stage
 FROM alpine:3.18
 WORKDIR /app
 # Copy the executable file from the "builder" stage
 COPY --from=builder /app/main .
-COPY --from=builder /app/migrate.linux-amd64 ./migrate
+# COPY --from=builder /app/migrate.linux-amd64 ./migrate
 COPY app.env .
 COPY start.sh .
 COPY wait-for.sh .
-COPY db/migration ./migration
+COPY db/migration ./db/migration
 
 # Publish docker image through port 8080
 EXPOSE 8080
