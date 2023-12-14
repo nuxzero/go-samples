@@ -28,6 +28,11 @@ migratedown:
 migratedown1:
 	migrate -path db/migration -database "$(DB_URL)" -verbose down 1
 
+# Generate migration file
+# e.g. `make new_migration name=create_users_table`
+new_migration:
+	migrate create -ext sql -dir db/migration -seq $(name)
+
 # Run sqlc to generate code
 sqlc:
 	sqlc generate
@@ -61,4 +66,4 @@ evans:
 redis:
 	docker run --name redis -p 6379:6379 -d redis:7.2.3-alpine
 
-.PHONY: postgres createdb dropdb sqlc test server mock proto evans redis
+.PHONY: postgres createdb dropdb sqlc test server mock proto evans redis new_migration
