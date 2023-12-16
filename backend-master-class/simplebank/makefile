@@ -47,6 +47,7 @@ server:
 # Generate mock code
 mock: 
 	mockgen -package mockdb -destination db/mock/store.go github.com/nuxzero/simplebank/db/sqlc Store
+	mockgen -package mockwk -destination worker/mock/distributor.go github.com/nuxzero/simplebank/worker TaskDistributor
 
 # Generate proto https://protobuf.dev/reference/go/go-generated/
 proto:
