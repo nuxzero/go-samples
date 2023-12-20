@@ -6,6 +6,15 @@ services:
       - POSTGRES_USER=root
       - POSTGRES_PASSWORD=secret
       - POSTGRES_DB=simple_bank
+    ports:
+      - "5432:5432"
+    volumes:
+      # Mount the data-volume to the postgres container.
+      # So the data will be stored in the data-volume.
+      # When the postgres container is removed, the data-volume will not be removed.
+      - data-volume:/var/lib/postgresql/data
+  redis:
+    image: redis:7-alpine
   api:
     build:
       # Tell docker-compose to build the image from the current directory.
@@ -14,16 +23,19 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8080:8080"
+      - "9090:9090"
     environment:
       # All services in Docker-compose will run on the same network.
       # You can use the "postgres" service name to connect to the postgres container.
       - DB_SOURCE=postgresql://root:secret@postgres:5432/simple_bank?sslmode=disable
+      - REDIS_ADDRESS=0.0.0.0:6379
       # `depends_on` does not wait for the postgres container to be ready.
       # If you want to wait for the postgres container to be ready, you can use
       # the `wait-for` https://github.com/eficode/wait-for.
       # https://docs.docker.com/compose/startup-order/
     depends_on:
       - postgres
+      - redis
     # This will override the default command in the Dockerfile.
     # Wait for the postgres container to be ready, then run start.sh.
     entrypoint: ["/app/wait-for.sh", "postgres:5432", "--", "/app/start.sh"]
@@ -33,3 +45,7 @@ services:
     # if there’s a `CMD` instruction in the Dockerfile, it is ignored.
     # So we need to explicitly define the command here.
     command: ["/app/main"]
+
+# Define a volume to store the data.
+volumes:
+  data-volume:
