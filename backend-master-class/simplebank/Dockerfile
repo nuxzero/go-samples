@@ -22,7 +22,7 @@ COPY wait-for.sh .
 COPY db/migration ./db/migration
 
 # Publish docker image through port 8080
-EXPOSE 8080
+EXPOSE 8080 9090
 CMD ["/app/main"]
 # If `CMD` is used to provide default arguments for the `ENTRYPOINT` instruction, 
 # both the `CMD` and `ENTRYPOINT` instructions should be specified with the JSON array format.
